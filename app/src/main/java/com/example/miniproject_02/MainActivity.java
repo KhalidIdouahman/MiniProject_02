@@ -2,9 +2,10 @@ package com.example.miniproject_02;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -23,13 +24,56 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding bindingViews;
     View root;
+    SharedPreferences session;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bindingViews = ActivityMainBinding.inflate(getLayoutInflater());
         root = bindingViews.getRoot();
         setContentView(root);
+//      create the sharedPreferences
+        session = getSharedPreferences("pin_the_quotes" , MODE_PRIVATE);
 
+        String quote = session.getString("quote" , null);
+
+        if (quote == null) {
+            sendRequestToGetQuotes();
+        } else {
+            String author = session.getString("author" , null);
+
+            bindingViews.quoteTv.setText(quote);
+            bindingViews.authorTv.setText(author);
+
+            bindingViews.pinToggleBtn.setChecked(true);
+        }
+
+        bindingViews.pinToggleBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences.Editor editSession = session.edit();
+                String savedQuote = null;
+                String savedAuthor = null;
+
+                if (isChecked) {
+                    savedQuote = bindingViews.quoteTv.getText().toString();
+                    savedAuthor = bindingViews.authorTv.getText().toString();
+                } else {
+                    sendRequestToGetQuotes();
+                }
+
+                editSession.putString("quote" , savedQuote);
+                editSession.putString("author" , savedAuthor);
+
+                editSession.apply();
+            }
+        });
+        bindingViews.passBtn.setOnClickListener(v -> {
+            finish();
+        });
+    }
+
+    private void sendRequestToGetQuotes() {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         String url = getRandomUrls(25 , 80);
 
@@ -38,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(JSONObject response) {
                 try {
                     bindingViews.quoteTv.setText(response.getString("quote"));
-                    bindingViews.author.setText(response.getString("author"));
+                    bindingViews.authorTv.setText(response.getString("author"));
                     Toast.makeText(MainActivity.this, response.getString("id"), Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -52,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         requestQueue.add(JsonObjReq);
-
     }
 
     public String getRandomUrls(int min , int max) {
