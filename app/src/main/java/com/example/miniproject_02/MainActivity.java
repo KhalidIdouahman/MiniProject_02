@@ -3,8 +3,11 @@ package com.example.miniproject_02;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
@@ -18,13 +21,14 @@ import com.example.miniproject_02.databinding.ActivityMainBinding;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding bindingViews;
     View root;
-    SharedPreferences session;
+    SharedPreferences session , colorSession ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +39,63 @@ public class MainActivity extends AppCompatActivity {
 //      create the sharedPreferences
         session = getSharedPreferences("pin_the_quotes" , MODE_PRIVATE);
 
+        colorSession = getSharedPreferences("bg_colors" , MODE_PRIVATE);
+
+        //region fill the spinner
+        ArrayList<String> color_names = new ArrayList<>();
+        color_names.add("Default");
+        color_names.add("LightSalmon");
+        color_names.add("Plum");
+        color_names.add("PaleGreen");
+        color_names.add("CornflowerBlue");
+
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this ,
+                android.R.layout.simple_spinner_dropdown_item , color_names);
+
+        bindingViews.bgColorsSpinner.setAdapter(spinnerAdapter);
+        //endregion
+
+        int id = colorSession.getInt("item_id" , 0);
+
+        bindingViews.bgColorsSpinner.setSelection(id);
+        bindingViews.bgColorsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                SharedPreferences.Editor colorEdit = colorSession.edit();
+                String bgColor = null;
+                switch (position) {
+                    case 0 :
+                        bgColor = "#FFFFFF";
+                        colorEdit.putInt("item_id" , position);
+                        break;
+                    case 1 :
+                        bgColor = "#FFA07A";
+                        colorEdit.putInt("item_id" , position);
+                        break;
+
+                    case 2 :
+                        bgColor = "#DDA0DD";
+                        colorEdit.putInt("item_id" , position);
+                        break;
+                    case 3 :
+                        bgColor = "#98FB98";
+                        colorEdit.putInt("item_id" , position);
+                        break;
+                    case 4 :
+                        bgColor = "#6495ED";
+                        colorEdit.putInt("item_id" , position);
+                        break;
+                }
+                root.setBackgroundColor(Color.parseColor(bgColor));
+                colorEdit.apply();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        //region sharedPreferences for pining the quotes
         String quote = session.getString("quote" , null);
 
         if (quote == null) {
@@ -47,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
             bindingViews.pinToggleBtn.setChecked(true);
         }
+        //endregion
 
         bindingViews.pinToggleBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
