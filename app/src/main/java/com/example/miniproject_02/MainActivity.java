@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
@@ -13,7 +14,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.miniproject_02.Models.Quote;
 import com.example.miniproject_02.databinding.ActivityMainBinding;
+import com.example.miniproject_02.db.FavoriteQuotesSQLiteDB;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,7 +35,8 @@ public class MainActivity extends AppCompatActivity {
         bindingViews = ActivityMainBinding.inflate(getLayoutInflater());
         root = bindingViews.getRoot();
         setContentView(root);
-//      create the sharedPreferences
+
+        //region Pin Quote with SharedPreferences
         session = getSharedPreferences("pin_the_quotes" , MODE_PRIVATE);
 
         String quote = session.getString("quote" , null);
@@ -68,6 +72,28 @@ public class MainActivity extends AppCompatActivity {
                 editSession.apply();
             }
         });
+        //endregion
+
+        // for test and it's working .
+        FavoriteQuotesSQLiteDB db = new FavoriteQuotesSQLiteDB(this);
+
+//        db.addQuote(1, "khalid is the best !" , "Khalid");
+//        db.addQuote(2 , "if you have a dream that's all what you need ." , "me");
+//        db.addQuote(3, "to delete" , "bey");
+
+//        db.getAll();
+
+        db.addQuote(new Quote(1, "khalid is the best !" , "Khalid"));
+        db.addQuote(new Quote(2 , "if you have a dream that's all what you need ." , "me"));
+        db.addQuote(new Quote(3, "to delete" , "bey"));
+
+        db.deleteQuote(3);
+
+        for (Quote quoteSaved : db.getAllQuotes()) {
+            Log.e("Sql quotes", String.format("getAll: %d , %s , %s ." , quoteSaved.getId() , quoteSaved.getQuote(), quoteSaved.getAuthor()));
+        }
+        //
+
         bindingViews.passBtn.setOnClickListener(v -> {
             finish();
         });
