@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     ActivityMainBinding bindingViews;
     View root;
     SharedPreferences session;
+    boolean isFavorite = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +45,10 @@ public class MainActivity extends AppCompatActivity {
         if (quote == null) {
             sendRequestToGetQuotes();
         } else {
+            int id = session.getInt("id" , 0);
             String author = session.getString("author" , null);
 
+            bindingViews.idTv.setText(String.valueOf(id));
             bindingViews.quoteTv.setText(quote);
             bindingViews.authorTv.setText(author);
 
@@ -56,16 +59,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 SharedPreferences.Editor editSession = session.edit();
+                int savedId = 0;
                 String savedQuote = null;
                 String savedAuthor = null;
 
                 if (isChecked) {
+                    savedId = Integer.parseInt(bindingViews.idTv.getText().toString());
                     savedQuote = bindingViews.quoteTv.getText().toString();
                     savedAuthor = bindingViews.authorTv.getText().toString();
                 } else {
                     sendRequestToGetQuotes();
                 }
 
+                editSession.putInt("id" , savedId);
                 editSession.putString("quote" , savedQuote);
                 editSession.putString("author" , savedAuthor);
 
@@ -74,25 +80,28 @@ public class MainActivity extends AppCompatActivity {
         });
         //endregion
 
-        // for test and it's working .
+        //region favorite the quotes and save them into Sqlite.
+
         FavoriteQuotesSQLiteDB db = new FavoriteQuotesSQLiteDB(this);
 
-//        db.addQuote(1, "khalid is the best !" , "Khalid");
-//        db.addQuote(2 , "if you have a dream that's all what you need ." , "me");
-//        db.addQuote(3, "to delete" , "bey");
+        bindingViews.isFavoriteIm.setOnClickListener(v -> {
+            int id = Integer.parseInt(bindingViews.idTv.getText().toString());
+            String quoteSqlite = bindingViews.quoteTv.getText().toString();
+            String authorSqlite = bindingViews.authorTv.getText().toString();
 
-//        db.getAll();
+            if (isFavorite) {
+                bindingViews.isFavoriteIm.setBackgroundResource(R.drawable.ic_unfavorite);
+                db.deleteQuote(id);
+            } else {
+                bindingViews.isFavoriteIm.setBackgroundResource(R.drawable.ic_favorite);
+                db.addQuote(new Quote(id,quoteSqlite,authorSqlite));
+            }
 
-        db.addQuote(new Quote(1, "khalid is the best !" , "Khalid"));
-        db.addQuote(new Quote(2 , "if you have a dream that's all what you need ." , "me"));
-        db.addQuote(new Quote(3, "to delete" , "bey"));
-
-        db.deleteQuote(3);
-
-        for (Quote quoteSaved : db.getAllQuotes()) {
-            Log.e("Sql quotes", String.format("getAll: %d , %s , %s ." , quoteSaved.getId() , quoteSaved.getQuote(), quoteSaved.getAuthor()));
-        }
-        //
+            for (Quote quoteSaved : db.getAllQuotes()) {
+                Log.e("Sql quotes", quoteSaved.toString());
+            }
+        });
+        //endregion
 
         bindingViews.passBtn.setOnClickListener(v -> {
             finish();
@@ -107,9 +116,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONObject response) {
                 try {
+                    bindingViews.idTv.setText(response.getString("id"));
                     bindingViews.quoteTv.setText(response.getString("quote"));
                     bindingViews.authorTv.setText(response.getString("author"));
-                    Toast.makeText(MainActivity.this, response.getString("id"), Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

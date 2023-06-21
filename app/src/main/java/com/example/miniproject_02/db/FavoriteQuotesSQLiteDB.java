@@ -89,7 +89,7 @@ public class FavoriteQuotesSQLiteDB extends SQLiteOpenHelper {
             int id = cursor.getInt(cursor.getColumnIndexOrThrow(FavoriteQuotesModel.Infos.COLUMN_ID));
             String quote = cursor.getString(cursor.getColumnIndexOrThrow(FavoriteQuotesModel.Infos.COLUMN_QUOTE));
             String author = cursor.getString(cursor.getColumnIndexOrThrow(FavoriteQuotesModel.Infos.COLUMN_AUTHOR));
-            Log.e("Sql quotes", String.format("getAll: %d , %s , %s ." , id , quote , author));
+            Log.e("Sql quotes", String.format("Quote : %d , %s , %s .", id, quote, author));
         }
 
         cursor.close();

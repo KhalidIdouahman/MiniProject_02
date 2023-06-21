@@ -1,5 +1,7 @@
 package com.example.miniproject_02.Models;
 
+import androidx.annotation.NonNull;
+
 public class Quote {
     private int id;
     private String quote;
@@ -21,5 +23,11 @@ public class Quote {
 
     public String getAuthor() {
         return author;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return String.format("The Quote : %d , %s , %s ." , getId() , getQuote(), getAuthor());
     }
 }
