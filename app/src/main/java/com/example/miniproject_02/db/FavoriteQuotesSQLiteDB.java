@@ -129,4 +129,24 @@ public class FavoriteQuotesSQLiteDB extends SQLiteOpenHelper {
         cursor.close();
         return quoteslist;
     }
+
+    public boolean isQuoteInDB(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String selection = FavoriteQuotesModel.Infos.COLUMN_ID + " LIKE ?";
+        String[] projection = {FavoriteQuotesModel.Infos.COLUMN_ID};
+        String[] selectionArgs = {Integer.toString(id)};
+
+        Cursor cursor = db.query(FavoriteQuotesModel.Infos.TABLE_NAME ,
+                projection ,
+                selection ,
+                selectionArgs ,
+                null ,
+                null ,
+                null);
+
+        boolean value = cursor.moveToNext();
+        cursor.close();
+        return value;
+    }
 }
