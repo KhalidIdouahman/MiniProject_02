@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">MiniProject_02</string>
+
+
+    <string-array name="color_names" >
+        <item>Default</item>
+        <item>LightSalmon</item>
+        <item>Plum</item>
+        <item>PaleGreen</item>
+        <item>CornFlowerBlue</item>
+    </string-array>
+
+    <string-array name="color_codes" >
+        <item>#FFFBFE</item>
+        <item>#FFA07A</item>
+        <item>#DDA0DD</item>
+        <item>#98FB98</item>
+        <item>#6495ED</item>
+    </string-array>
+
 </resources>

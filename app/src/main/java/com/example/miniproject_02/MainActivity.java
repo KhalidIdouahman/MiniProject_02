@@ -1,11 +1,15 @@
 package com.example.miniproject_02;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
@@ -22,6 +26,7 @@ import com.example.miniproject_02.db.FavoriteQuotesSQLiteDB;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     View root;
     SharedPreferences session;
     boolean isFavorite = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,10 +112,32 @@ public class MainActivity extends AppCompatActivity {
         });
         //endregion
 
+        registerForContextMenu(bindingViews.colorSelectorIm);
+
         bindingViews.showAllQuotesBtn.setOnClickListener(v -> {
             Intent intent = new Intent(this, AllFavoriteQuotes.class);
             startActivity(intent);
         });
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        String[] colorsNames = getResources().getStringArray(R.array.color_names);
+
+        for (int i = 0; i < colorsNames.length; i++) {
+            menu.add(0 , i , 0 , colorsNames[i]);
+
+        }
+
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        String[] colorsCodes = getResources().getStringArray(R.array.color_codes);
+        String colorCode = colorsCodes[item.getItemId()];
+        root.setBackgroundColor(Color.parseColor(colorCode));
+        return true;
     }
 
     private void sendRequestToGetQuotes() {
