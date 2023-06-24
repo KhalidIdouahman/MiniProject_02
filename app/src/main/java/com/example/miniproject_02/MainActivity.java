@@ -2,6 +2,7 @@ package com.example.miniproject_02;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -69,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
                     savedAuthor = bindingViews.authorTv.getText().toString();
                 } else {
                     sendRequestToGetQuotes();
+                    isFavorite = false;
+                    bindingViews.isFavoriteIm.setBackgroundResource(R.drawable.ic_unfavorite);
                 }
 
                 editSession.putInt("id" , savedId);
@@ -103,8 +106,9 @@ public class MainActivity extends AppCompatActivity {
         });
         //endregion
 
-        bindingViews.passBtn.setOnClickListener(v -> {
-            finish();
+        bindingViews.showAllQuotesBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AllFavoriteQuotes.class);
+            startActivity(intent);
         });
     }
 
