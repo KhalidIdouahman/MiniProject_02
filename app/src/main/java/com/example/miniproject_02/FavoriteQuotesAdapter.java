@@ -1,6 +1,7 @@
 package com.example.miniproject_02;
 
 import android.content.Context;
+import android.text.style.DynamicDrawableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,8 +35,9 @@ public class FavoriteQuotesAdapter extends RecyclerView.Adapter<FavoriteQuotesAd
     public void onBindViewHolder(@NonNull FavoriteQuotesViewHolder holder, int position) {
         Quote quote = quotesList.get(position);
 
-        holder.favQuote.setText(quote.getQuote());
-        holder.favAuthor.setText(quote.getAuthor());
+        holder.favQuote.setText(quote.quoteDesign(context , R.drawable.ic_quote , DynamicDrawableSpan.ALIGN_CENTER));
+        holder.favAuthor.setText(quote.authorDesign());
+
     }
 
     @Override

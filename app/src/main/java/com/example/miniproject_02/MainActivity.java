@@ -1,11 +1,14 @@
 package com.example.miniproject_02;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
@@ -37,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     boolean isFavorite ;
     SharedPreferences session , firstTime;
     SettingsSQLiteDB settingsSQLiteDB;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        String colorName = settingsSQLiteDB.getBgColor();
 
         //region Pin Quote with SharedPreferences
         session = getSharedPreferences("pin_the_quotes" , MODE_PRIVATE);
@@ -147,6 +150,12 @@ public class MainActivity extends AppCompatActivity {
         });
         //endregion
 
+        registerForContextMenu(bindingViews.colorSelectorIm);
+
+        bindingViews.colorSelectorIm.setOnClickListener(v -> {
+            openContextMenu(bindingViews.colorSelectorIm);
+        });
+
         bindingViews.showAllQuotesBtn.setOnClickListener(v -> {
             Intent intent = new Intent(this, AllFavoriteQuotes.class);
             startActivity(intent);
@@ -154,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
         ArrayList<ColorModel> colorModels = settingsSQLiteDB.getColors();
 
+        String colorName = settingsSQLiteDB.getBgColor();
         int colorPosition = -1;
         for (int i = 0 ; i < colorModels.size() ; i++ ) {
             if (colorModels.get(i).getName().equals(colorName)) {
@@ -192,6 +202,29 @@ public class MainActivity extends AppCompatActivity {
             isFavorite = false;
             bindingViews.isFavoriteIm.setBackgroundResource(R.drawable.ic_unfavorite);
         }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        String[] colorsNames = getResources().getStringArray(R.array.color_names);
+
+        for (int i = 0; i < colorsNames.length; i++) {
+            menu.add(0 , i , 0 , colorsNames[i]);
+        }
+
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        String[] colorsCodes = getResources().getStringArray(R.array.color_codes);
+
+        int position = item.getItemId();
+        String colorCode = colorsCodes[position];
+
+        bindingViews.selectBgColorSpinner.setSelection(position);
+        root.setBackgroundColor(Color.parseColor(colorCode));
+        return true;
     }
 
     private void sendRequestToGetQuotes() {
