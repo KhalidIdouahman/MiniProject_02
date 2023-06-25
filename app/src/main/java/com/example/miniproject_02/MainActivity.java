@@ -114,6 +114,10 @@ public class MainActivity extends AppCompatActivity {
 
         registerForContextMenu(bindingViews.colorSelectorIm);
 
+        bindingViews.colorSelectorIm.setOnClickListener(v -> {
+            openContextMenu(bindingViews.colorSelectorIm);
+        });
+
         bindingViews.showAllQuotesBtn.setOnClickListener(v -> {
             Intent intent = new Intent(this, AllFavoriteQuotes.class);
             startActivity(intent);
@@ -127,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < colorsNames.length; i++) {
             menu.add(0 , i , 0 , colorsNames[i]);
-
         }
 
     }
