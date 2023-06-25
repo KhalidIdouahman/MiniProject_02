@@ -4,8 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
@@ -14,22 +16,28 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.miniproject_02.Models.ColorModel;
 import com.example.miniproject_02.Models.Quote;
+import com.example.miniproject_02.Models.Settings;
 import com.example.miniproject_02.databinding.ActivityMainBinding;
 import com.example.miniproject_02.db.FavoriteQuotesSQLiteDB;
+import com.example.miniproject_02.db.SettingsSQLiteDB;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding bindingViews;
     View root;
-    SharedPreferences session;
     FavoriteQuotesSQLiteDB db;
     boolean isFavorite ;
+    SharedPreferences session , firstTime;
+    SettingsSQLiteDB settingsSQLiteDB;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,8 +45,32 @@ public class MainActivity extends AppCompatActivity {
         root = bindingViews.getRoot();
         setContentView(root);
 
-       db = new FavoriteQuotesSQLiteDB(this);
+        db = new FavoriteQuotesSQLiteDB(this);
 
+        settingsSQLiteDB = new SettingsSQLiteDB(this);
+
+        //region this is for execute this code just for the first time the app is installed
+        firstTime = getSharedPreferences("forFirstTime" , MODE_PRIVATE);
+
+        boolean isFirstTime = firstTime.getBoolean("isFirstTime" , true);
+
+        if (isFirstTime) {
+            settingsSQLiteDB.addColor(new ColorModel("Default" , "#FFFFFF"));
+            settingsSQLiteDB.addColor(new ColorModel("LightSalmon" , "#FFA07A"));
+            settingsSQLiteDB.addColor(new ColorModel("Plum" , "#DDA0DD"));
+            settingsSQLiteDB.addColor(new ColorModel("PaleGreen" , "#98FB98"));
+            settingsSQLiteDB.addColor(new ColorModel("CornFlowerBlue" , "#6495ED"));
+
+            settingsSQLiteDB.addBgColor();
+            SharedPreferences.Editor edit = firstTime.edit();
+            edit.putBoolean("isFirstTime" , false);
+            edit.apply();
+        }
+        //endregion
+
+
+
+        String colorName = settingsSQLiteDB.getBgColor();
 
         //region Pin Quote with SharedPreferences
         session = getSharedPreferences("pin_the_quotes" , MODE_PRIVATE);
@@ -120,6 +152,35 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        ArrayList<ColorModel> colorModels = settingsSQLiteDB.getColors();
+
+        int colorPosition = -1;
+        for (int i = 0 ; i < colorModels.size() ; i++ ) {
+            if (colorModels.get(i).getName().equals(colorName)) {
+                colorPosition = i;
+                break;
+            }
+        }
+
+        SpinnerAdapter spinnerAdapter = new SpinnerAdapter(this , colorModels);
+        bindingViews.selectBgColorSpinner.setAdapter(spinnerAdapter);
+        bindingViews.selectBgColorSpinner.setSelection(colorPosition);
+
+        bindingViews.selectBgColorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String colorName = colorModels.get(position).getName();
+                String colorCode = colorModels.get(position).getCode();
+
+                settingsSQLiteDB.updateBgColor(new Settings("bg_color" , colorName));
+                root.setBackgroundColor(Color.parseColor(colorCode));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
     }
     private void isFavQuoteInDB() {
