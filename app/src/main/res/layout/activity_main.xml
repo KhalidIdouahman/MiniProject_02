@@ -25,9 +25,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="# id"
+            android:text="-1"
             android:textColor="#FFFFFF"
-            android:textSize="20sp"  />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/quote_tv"
@@ -90,4 +90,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_unfavorite" />
+
+    <Button
+        android:id="@+id/refresh_quote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="55dp"
+        android:text="Give me other Quote"
+        app:layout_constraintBottom_toTopOf="@+id/pass_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

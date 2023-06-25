@@ -129,4 +129,16 @@ public class FavoriteQuotesSQLiteDB extends SQLiteOpenHelper {
         cursor.close();
         return quoteslist;
     }
+
+    public boolean isInDb(int id ) {
+        ArrayList<Quote> quotes = getAllQuotes();
+
+        for (Quote quote : quotes) {
+            if (quote.getId() == id) {
+                Log.e("test", "isInDb: " + quote.getId() + " " + quote.getQuote());
+                return true;
+            }
+        }
+        return false;
+    }
 }
