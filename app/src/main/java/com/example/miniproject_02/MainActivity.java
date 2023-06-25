@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
@@ -30,8 +29,7 @@ public class MainActivity extends AppCompatActivity {
     View root;
     SharedPreferences session;
     FavoriteQuotesSQLiteDB db;
-    boolean isFavorite = false;
-
+    boolean isFavorite ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
         root = bindingViews.getRoot();
         setContentView(root);
 
-        db = new FavoriteQuotesSQLiteDB(this);
+       db = new FavoriteQuotesSQLiteDB(this);
+
 
         //region Pin Quote with SharedPreferences
         session = getSharedPreferences("pin_the_quotes" , MODE_PRIVATE);
@@ -71,10 +70,13 @@ public class MainActivity extends AppCompatActivity {
                     savedId = Integer.parseInt(bindingViews.idTv.getText().toString());
                     savedQuote = bindingViews.quoteTv.getText().toString();
                     savedAuthor = bindingViews.authorTv.getText().toString();
+                    if (!isFavorite) {
+                        isFavorite = true;
+                        bindingViews.isFavoriteIm.setBackgroundResource(R.drawable.ic_favorite);
+                        db.addQuote(new Quote(savedId , savedQuote , savedAuthor));
+                    }
                 } else {
                     sendRequestToGetQuotes();
-                    isFavorite = false;
-                    bindingViews.isFavoriteIm.setBackgroundResource(R.drawable.ic_unfavorite);
                 }
 
                 editSession.putInt("id" , savedId);
@@ -100,6 +102,9 @@ public class MainActivity extends AppCompatActivity {
             String authorSqlite = bindingViews.authorTv.getText().toString();
 
             if (isFavorite) {
+                if (bindingViews.pinToggleBtn.isChecked()) {
+                    bindingViews.pinToggleBtn.setChecked(false);
+                }
                 bindingViews.isFavoriteIm.setBackgroundResource(R.drawable.ic_unfavorite);
                 db.deleteQuote(idSqlite);
             } else {
@@ -107,9 +112,6 @@ public class MainActivity extends AppCompatActivity {
                 db.addQuote(new Quote(idSqlite,quoteSqlite,authorSqlite));
             }
 
-            for (Quote quoteSaved : db.getAllQuotes()) {
-                Log.e("Sql quotes", quoteSaved.toString());
-            }
         });
         //endregion
 
@@ -117,11 +119,12 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, AllFavoriteQuotes.class);
             startActivity(intent);
         });
-    }
 
+
+    }
     private void isFavQuoteInDB() {
         int id = Integer.parseInt(bindingViews.idTv.getText().toString());
-        if (db.isInDb(id)) {
+        if (db.isQuoteInDB(id)) {
             isFavorite = true;
             bindingViews.isFavoriteIm.setBackgroundResource(R.drawable.ic_favorite);
         } else {
