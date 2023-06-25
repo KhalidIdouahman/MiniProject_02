@@ -34,7 +34,7 @@ public class FavoriteQuotesAdapter extends RecyclerView.Adapter<FavoriteQuotesAd
     public void onBindViewHolder(@NonNull FavoriteQuotesViewHolder holder, int position) {
         Quote quote = quotesList.get(position);
 
-        holder.favQuote.setText(quote.designedInfos());
+        holder.favQuote.setText(quote.getQuote());
         holder.favAuthor.setText(quote.getAuthor());
     }
 
