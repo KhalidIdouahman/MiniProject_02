@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     boolean isFavorite ;
     SharedPreferences session , firstTime;
     SettingsSQLiteDB settingsSQLiteDB;
-
+    int itemId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -211,19 +211,18 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < colorsNames.length; i++) {
             menu.add(0 , i , 0 , colorsNames[i]);
+            if (i == itemId) {
+                menu.getItem(i).setEnabled(false);
+            }
         }
-
     }
 
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         String[] colorsCodes = getResources().getStringArray(R.array.color_codes);
-
-        int position = item.getItemId();
-        String colorCode = colorsCodes[position];
-
-        bindingViews.selectBgColorSpinner.setSelection(position);
-        root.setBackgroundColor(Color.parseColor(colorCode));
+        itemId = item.getItemId();
+        bindingViews.selectBgColorSpinner.setSelection(itemId);
+        root.setBackgroundColor(Color.parseColor(colorsCodes[itemId]));
         return true;
     }
 
